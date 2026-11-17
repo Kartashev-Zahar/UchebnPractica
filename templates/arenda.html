@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="forma">
+        <h1>Аренда: {{ instrument.nazvanie }}</h1>
+        <p>Залог: {{ instrument.zalog }} ₽. Скидка рассчитывается по тарифу для выбранного срока.</p>
+        {% if ошибка %}
+            <p>{{ ошибка }}</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <label>
+                Срок аренды в сутках
+                <input type="number" name="srok" min="1" max="60" value="1" required>
+            </label>
+            <p>Расходники</p>
+            {% for item in osnastka %}
+                <label>
+                    <input type="checkbox" name="osnastka" value="{{ item.id }}">
+                    {{ item.nazvanie }} ({{ item.cena }} ₽)
+                </label>
+            {% endfor %}
+            <button class="knopka">Оформить аренду</button>
+        </form>
+    </section>
+{% endblock %}

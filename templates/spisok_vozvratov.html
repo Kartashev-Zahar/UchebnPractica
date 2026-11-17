@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Инструменты на возврат</h1>
+    <section class="zakazy">
+        {% for item in zakazy %}
+            <article>
+                <h2>{{ item.ekzemplyar.model.nazvanie }}</h2>
+                <p>Клиент: {{ item.user.username }}</p>
+                <p>Вернуть до: {{ item.data_vozvrata }}</p>
+                <a href="{% url 'vozvrat' item.id %}">Принять возврат</a>
+            </article>
+        {% empty %}
+            <p>Активных договоров нет.</p>
+        {% endfor %}
+    </section>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="forma">
+        <h1>Возврат инструмента</h1>
+        <p>Договор №{{ dogovor.id }}</p>
+        <form method="post">
+            {% csrf_token %}
+            <label>
+                Дата и время возврата
+                <input type="datetime-local" name="data_vozvrata" required>
+            </label>
+            <label>
+                <input type="checkbox" name="ispraven" checked>
+                Инструмент исправен
+            </label>
+            <button class="knopka">Принять возврат</button>
+        </form>
+    </section>
+{% endblock %}

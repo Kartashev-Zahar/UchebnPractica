@@ -1,0 +1,1001 @@
+[
+  {
+    "model": "prokat_app.kategoriya",
+    "pk": 8,
+    "fields": {
+      "nazvanie": "Инструмент для обработки дерева"
+    }
+  },
+  {
+    "model": "prokat_app.kategoriya",
+    "pk": 7,
+    "fields": {
+      "nazvanie": "Виброплиты"
+    }
+  },
+  {
+    "model": "prokat_app.kategoriya",
+    "pk": 6,
+    "fields": {
+      "nazvanie": "Компрессоры"
+    }
+  },
+  {
+    "model": "prokat_app.kategoriya",
+    "pk": 5,
+    "fields": {
+      "nazvanie": "Строительные миксеры"
+    }
+  },
+  {
+    "model": "prokat_app.kategoriya",
+    "pk": 1,
+    "fields": {
+      "nazvanie": "Перфораторы и дрели"
+    }
+  },
+  {
+    "model": "prokat_app.kategoriya",
+    "pk": 2,
+    "fields": {
+      "nazvanie": "Пилы и шлифовальные машины"
+    }
+  },
+  {
+    "model": "prokat_app.kategoriya",
+    "pk": 3,
+    "fields": {
+      "nazvanie": "Генераторы"
+    }
+  },
+  {
+    "model": "prokat_app.kategoriya",
+    "pk": 4,
+    "fields": {
+      "nazvanie": "Строительные пылесосы"
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 1,
+    "fields": {
+      "nazvanie": "Перфоратор строительный",
+      "kategoriya": 1,
+      "opisanie": "Для сверления бетона и кирпича.",
+      "foto": "perforator_sds_plus.png",
+      "cena_za_sutki": 900,
+      "zalog": 5000
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 2,
+    "fields": {
+      "nazvanie": "Пила дисковая",
+      "kategoriya": 2,
+      "opisanie": "Для прямого распила досок и листовых материалов.",
+      "foto": "pila_2000w.png",
+      "cena_za_sutki": 700,
+      "zalog": 4000
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 3,
+    "fields": {
+      "nazvanie": "Генератор переносной 2 кВт",
+      "kategoriya": 3,
+      "opisanie": "Подойдет для временного электроснабжения на объекте.",
+      "foto": "generator_2kw.png",
+      "cena_za_sutki": 1500,
+      "zalog": 10000
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 4,
+    "fields": {
+      "nazvanie": "Пылесос строительный с циклоном",
+      "kategoriya": 4,
+      "opisanie": "Для сбора строительной пыли с помощью циклонного фильтра.",
+      "foto": "pylesos_cyclone.png",
+      "cena_za_sutki": 600,
+      "zalog": 3000
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 1,
+    "fields": {
+      "model": 1,
+      "seriinij_nomer": "PR-001",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 2,
+    "fields": {
+      "model": 1,
+      "seriinij_nomer": "PR-002",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 3,
+    "fields": {
+      "model": 1,
+      "seriinij_nomer": "PR-003",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 4,
+    "fields": {
+      "model": 2,
+      "seriinij_nomer": "PI-001",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 5,
+    "fields": {
+      "model": 2,
+      "seriinij_nomer": "PI-002",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 6,
+    "fields": {
+      "model": 2,
+      "seriinij_nomer": "PI-003",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 7,
+    "fields": {
+      "model": 3,
+      "seriinij_nomer": "GE-001",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 8,
+    "fields": {
+      "model": 3,
+      "seriinij_nomer": "GE-002",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 9,
+    "fields": {
+      "model": 4,
+      "seriinij_nomer": "PY-001",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 10,
+    "fields": {
+      "model": 4,
+      "seriinij_nomer": "PY-002",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.raskhodnik",
+    "pk": 1,
+    "fields": {
+      "nazvanie": "Бур по бетону",
+      "cena": 250
+    }
+  },
+  {
+    "model": "prokat_app.raskhodnik",
+    "pk": 2,
+    "fields": {
+      "nazvanie": "Диск для пилы",
+      "cena": 400
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 11,
+    "fields": {
+      "model": 3,
+      "seriinij_nomer": "GE-011",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 12,
+    "fields": {
+      "model": 4,
+      "seriinij_nomer": "PY-012",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 13,
+    "fields": {
+      "model": 1,
+      "seriinij_nomer": "PR-013",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 14,
+    "fields": {
+      "model": 2,
+      "seriinij_nomer": "PI-014",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 15,
+    "fields": {
+      "model": 3,
+      "seriinij_nomer": "GE-015",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 16,
+    "fields": {
+      "model": 4,
+      "seriinij_nomer": "PY-016",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 17,
+    "fields": {
+      "model": 1,
+      "seriinij_nomer": "PR-017",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 18,
+    "fields": {
+      "model": 2,
+      "seriinij_nomer": "PI-018",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 19,
+    "fields": {
+      "model": 3,
+      "seriinij_nomer": "GE-019",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 20,
+    "fields": {
+      "model": 4,
+      "seriinij_nomer": "PY-020",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 21,
+    "fields": {
+      "model": 1,
+      "seriinij_nomer": "PR-021",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 22,
+    "fields": {
+      "model": 2,
+      "seriinij_nomer": "PI-022",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 23,
+    "fields": {
+      "model": 3,
+      "seriinij_nomer": "GE-023",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 24,
+    "fields": {
+      "model": 4,
+      "seriinij_nomer": "PY-024",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 25,
+    "fields": {
+      "model": 1,
+      "seriinij_nomer": "PR-025",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 26,
+    "fields": {
+      "model": 2,
+      "seriinij_nomer": "PI-026",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 27,
+    "fields": {
+      "model": 3,
+      "seriinij_nomer": "GE-027",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 28,
+    "fields": {
+      "model": 4,
+      "seriinij_nomer": "PY-028",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 29,
+    "fields": {
+      "model": 1,
+      "seriinij_nomer": "PR-029",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 30,
+    "fields": {
+      "model": 2,
+      "seriinij_nomer": "PI-030",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.kategoriya",
+    "pk": 2,
+    "fields": {
+      "nazvanie": "Пилы и шлифовальные машины"
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 5,
+    "fields": {
+      "nazvanie": "Перфоратор SDS-max 1500 Вт",
+      "kategoriya": 1,
+      "opisanie": "Для сверления и долбления бетона при тяжелых работах.",
+      "foto": "perforator_sds_max.png",
+      "cena_za_sutki": 500,
+      "zalog": 3000
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 6,
+    "fields": {
+      "nazvanie": "Пила дисковая аккумуляторная",
+      "kategoriya": 2,
+      "opisanie": "Для распила досок и листовых материалов без сетевого подключения.",
+      "foto": "pila_disk_akkum.png",
+      "cena_za_sutki": 540,
+      "zalog": 3300
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 7,
+    "fields": {
+      "nazvanie": "Дрель ударная",
+      "kategoriya": 1,
+      "opisanie": "Для сверления дерева, металла и кирпича.",
+      "foto": "udar_drill.png",
+      "cena_za_sutki": 580,
+      "zalog": 3600
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 8,
+    "fields": {
+      "nazvanie": "Шуруповерт аккумуляторный",
+      "kategoriya": 1,
+      "opisanie": "Для закручивания крепежа и сверления небольших отверстий.",
+      "foto": "akkum_shurupovert.png",
+      "cena_za_sutki": 620,
+      "zalog": 3900
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 9,
+    "fields": {
+      "nazvanie": "Миксер строительный",
+      "kategoriya": 5,
+      "opisanie": "Для перемешивания раствора, клея и строительных смесей.",
+      "foto": "mixer_stroitelny.png",
+      "cena_za_sutki": 660,
+      "zalog": 4200
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 10,
+    "fields": {
+      "nazvanie": "Угловая шлифмашина 125 мм",
+      "kategoriya": 2,
+      "opisanie": "Для резки и шлифования металла и камня.",
+      "foto": "ushm_125.png",
+      "cena_za_sutki": 700,
+      "zalog": 4500
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 11,
+    "fields": {
+      "nazvanie": "Угловая шлифмашина 230 мм",
+      "kategoriya": 2,
+      "opisanie": "Для резки толстых заготовок и строительных материалов.",
+      "foto": "ushm_230.png",
+      "cena_za_sutki": 740,
+      "zalog": 4800
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 12,
+    "fields": {
+      "nazvanie": "Пила торцовочная",
+      "kategoriya": 2,
+      "opisanie": "Для точного поперечного распила деревянных деталей.",
+      "foto": "pila_torc.png",
+      "cena_za_sutki": 780,
+      "zalog": 5100
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 13,
+    "fields": {
+      "nazvanie": "Пила лобзиковая",
+      "kategoriya": 2,
+      "opisanie": "Для фигурного и прямого распила листовых материалов.",
+      "foto": "pila_lobz.png",
+      "cena_za_sutki": 820,
+      "zalog": 5400
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 14,
+    "fields": {
+      "nazvanie": "Пила сабельная сетевая",
+      "kategoriya": 2,
+      "opisanie": "Для распила деревянных и пластиковых заготовок.",
+      "foto": "pila_shtr.png",
+      "cena_za_sutki": 860,
+      "zalog": 5700
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 15,
+    "fields": {
+      "nazvanie": "Штроборез",
+      "kategoriya": 2,
+      "opisanie": "Для прорезания каналов под проводку в стенах.",
+      "foto": "shtroborez.png",
+      "cena_za_sutki": 900,
+      "zalog": 6000
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 16,
+    "fields": {
+      "nazvanie": "Рейсмус электрический",
+      "kategoriya": 8,
+      "opisanie": "Для выравнивания досок и получения одинаковой толщины.",
+      "foto": "reismus.png",
+      "cena_za_sutki": 940,
+      "zalog": 6300
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 17,
+    "fields": {
+      "nazvanie": "Генератор бензиновый 5 кВт",
+      "kategoriya": 3,
+      "opisanie": "Для автономного питания оборудования на стройплощадке.",
+      "foto": "generator_5kw.png",
+      "cena_za_sutki": 980,
+      "zalog": 6600
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 18,
+    "fields": {
+      "nazvanie": "Генератор инверторный",
+      "kategoriya": 3,
+      "opisanie": "Для стабильного электропитания чувствительной техники.",
+      "foto": "generator_invertor.png",
+      "cena_za_sutki": 1020,
+      "zalog": 6900
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 19,
+    "fields": {
+      "nazvanie": "Компрессор воздушный",
+      "kategoriya": 6,
+      "opisanie": "Для подачи сжатого воздуха к пневматическому инструменту.",
+      "foto": "kompressor.png",
+      "cena_za_sutki": 1060,
+      "zalog": 7200
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 20,
+    "fields": {
+      "nazvanie": "Виброплита бензиновая",
+      "kategoriya": 7,
+      "opisanie": "Для уплотнения грунта и тротуарной плитки.",
+      "foto": "vibroplita.png",
+      "cena_za_sutki": 1100,
+      "zalog": 7500
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 21,
+    "fields": {
+      "nazvanie": "Пылесос для сухой уборки",
+      "kategoriya": 4,
+      "opisanie": "Для сбора сухой строительной пыли и мелкого мусора.",
+      "foto": "pylesos_suhoy.png",
+      "cena_za_sutki": 1140,
+      "zalog": 7800
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 22,
+    "fields": {
+      "nazvanie": "Пылесос для влажной уборки",
+      "kategoriya": 4,
+      "opisanie": "Для сбора воды и влажной грязи после ремонта.",
+      "foto": "pylesos_vlazh.png",
+      "cena_za_sutki": 1180,
+      "zalog": 8100
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 23,
+    "fields": {
+      "nazvanie": "Пылесос промышленный 30 л",
+      "kategoriya": 4,
+      "opisanie": "Вместительный бак подходит для уборки на стройплощадке.",
+      "foto": "pylesos_30l.png",
+      "cena_za_sutki": 1220,
+      "zalog": 8400
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 24,
+    "fields": {
+      "nazvanie": "Пылесос промышленный 50 л",
+      "kategoriya": 4,
+      "opisanie": "Большой бак для продолжительной уборки строительного мусора.",
+      "foto": "pylesos_50l.png",
+      "cena_za_sutki": 1260,
+      "zalog": 8700
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 25,
+    "fields": {
+      "nazvanie": "Фрезер ручной погружной",
+      "kategoriya": 8,
+      "opisanie": "Для выборки пазов и обработки кромок деревянных деталей.",
+      "foto": "frez.png",
+      "cena_za_sutki": 1300,
+      "zalog": 9000
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 26,
+    "fields": {
+      "nazvanie": "Фрезер кромочный",
+      "kategoriya": 8,
+      "opisanie": "Для аккуратной обработки кромок и небольших пазов.",
+      "foto": "frezer_manual.png",
+      "cena_za_sutki": 1340,
+      "zalog": 9300
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 27,
+    "fields": {
+      "nazvanie": "Шлифмашина ленточная",
+      "kategoriya": 2,
+      "opisanie": "Для быстрого шлифования больших деревянных поверхностей.",
+      "foto": "shlifmashina_lenta.png",
+      "cena_za_sutki": 1380,
+      "zalog": 9600
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 28,
+    "fields": {
+      "nazvanie": "Шлифмашина эксцентриковая",
+      "kategoriya": 2,
+      "opisanie": "Для шлифования и финишной обработки поверхностей.",
+      "foto": "shlifmashina_eksc.png",
+      "cena_za_sutki": 1420,
+      "zalog": 9900
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 29,
+    "fields": {
+      "nazvanie": "Шлифмашина дельтавидная",
+      "kategoriya": 2,
+      "opisanie": "Для шлифования углов и труднодоступных участков.",
+      "foto": "shlifmashina_angle.png",
+      "cena_za_sutki": 1460,
+      "zalog": 10200
+    }
+  },
+  {
+    "model": "prokat_app.modelinstrumenta",
+    "pk": 30,
+    "fields": {
+      "nazvanie": "Пила настольная 2000 Вт",
+      "kategoriya": 2,
+      "opisanie": "Для продольного и поперечного распила досок.",
+      "foto": "pila_nastol.png",
+      "cena_za_sutki": 1500,
+      "zalog": 10500
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 31,
+    "fields": {
+      "model": 5,
+      "seriinij_nomer": "IN-005",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 32,
+    "fields": {
+      "model": 6,
+      "seriinij_nomer": "IN-006",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 33,
+    "fields": {
+      "model": 7,
+      "seriinij_nomer": "IN-007",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 34,
+    "fields": {
+      "model": 8,
+      "seriinij_nomer": "IN-008",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 35,
+    "fields": {
+      "model": 9,
+      "seriinij_nomer": "IN-009",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 36,
+    "fields": {
+      "model": 10,
+      "seriinij_nomer": "IN-010",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 37,
+    "fields": {
+      "model": 11,
+      "seriinij_nomer": "IN-011",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 38,
+    "fields": {
+      "model": 12,
+      "seriinij_nomer": "IN-012",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 39,
+    "fields": {
+      "model": 13,
+      "seriinij_nomer": "IN-013",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 40,
+    "fields": {
+      "model": 14,
+      "seriinij_nomer": "IN-014",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 41,
+    "fields": {
+      "model": 15,
+      "seriinij_nomer": "IN-015",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 42,
+    "fields": {
+      "model": 16,
+      "seriinij_nomer": "IN-016",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 43,
+    "fields": {
+      "model": 17,
+      "seriinij_nomer": "IN-017",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 44,
+    "fields": {
+      "model": 18,
+      "seriinij_nomer": "IN-018",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 45,
+    "fields": {
+      "model": 19,
+      "seriinij_nomer": "IN-019",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 46,
+    "fields": {
+      "model": 20,
+      "seriinij_nomer": "IN-020",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 47,
+    "fields": {
+      "model": 21,
+      "seriinij_nomer": "IN-021",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 48,
+    "fields": {
+      "model": 22,
+      "seriinij_nomer": "IN-022",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 49,
+    "fields": {
+      "model": 23,
+      "seriinij_nomer": "IN-023",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 50,
+    "fields": {
+      "model": 24,
+      "seriinij_nomer": "IN-024",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 51,
+    "fields": {
+      "model": 25,
+      "seriinij_nomer": "IN-025",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 52,
+    "fields": {
+      "model": 26,
+      "seriinij_nomer": "IN-026",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 53,
+    "fields": {
+      "model": 27,
+      "seriinij_nomer": "IN-027",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 54,
+    "fields": {
+      "model": 28,
+      "seriinij_nomer": "IN-028",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 55,
+    "fields": {
+      "model": 29,
+      "seriinij_nomer": "IN-029",
+      "ispraven": true,
+      "svoboden": true
+    }
+  },
+  {
+    "model": "prokat_app.ekzemplyar",
+    "pk": 56,
+    "fields": {
+      "model": 30,
+      "seriinij_nomer": "IN-030",
+      "ispraven": true,
+      "svoboden": true
+    }
+  }
+]

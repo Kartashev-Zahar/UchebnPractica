@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="forma">
+        <h1>
+            {% if instrument %}
+                Изменить инструмент
+            {% else %}
+                Добавить инструмент
+            {% endif %}
+        </h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="knopka">Сохранить</button>
+        </form>
+    </section>
+
+    <h2>Инструменты каталога</h2>
+    <section class="zakazy">
+        {% for item in instrumenty %}
+            <article>
+                <h3>{{ item.nazvanie }}</h3>
+                <a href="{% url 'instrument_redaktirovat' item.id %}">Изменить</a>
+                <form method="post" action="{% url 'instrument_udalenie' item.id %}">
+                    {% csrf_token %}
+                    <button>Удалить</button>
+                </form>
+            </article>
+        {% endfor %}
+    </section>
+{% endblock %}

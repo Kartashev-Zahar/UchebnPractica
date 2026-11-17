@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="forma">
+        <h1>Изменить срок аренды</h1>
+        <form method="post">
+            {% csrf_token %}
+            <label>
+                Суток
+                <input type="number" name="srok" min="1" max="60" value="{{ dogovor.srok_dnej }}">
+            </label>
+            <button class="knopka">Сохранить</button>
+        </form>
+    </section>
+{% endblock %}

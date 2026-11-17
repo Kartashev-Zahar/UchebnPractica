@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Мои заказы</h1>
+    <p><a class="knopka" href="{% url 'csv_zakazy' %}">Скачать список CSV</a></p>
+    <section class="zakazy">
+        {% for item in zakazy %}
+            <article>
+                <h2>{{ item.ekzemplyar.model.nazvanie }}</h2>
+                <p>Срок: {{ item.srok_dnej }} суток</p>
+                <p>Стоимость: {{ item.summa }} ₽</p>
+                <p>Залог: {{ item.zalog.summa }} ₽, остаток: {{ item.zalog.ostatok }} ₽</p>
+                <p>Вернуть до: {{ item.data_vozvrata }}</p>
+                <p>Статус: {{ item.status }}</p>
+                {% if item.status == 'Оформлен' %}
+                    <a class="knopka" href="{% url 'zakaz_izmenit' item.id %}">Изменить срок</a>
+                    <form method="post" action="{% url 'zakaz_udalenie' item.id %}">
+                        {% csrf_token %}
+                        <button class="knopka">Отменить аренду</button>
+                    </form>
+                {% endif %}
+            </article>
+        {% empty %}
+            <p>Заказов пока нет.</p>
+        {% endfor %}
+    </section>
+{% endblock %}
