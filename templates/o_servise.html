@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}О сервисе - Прокат инструмента{% endblock %}
+
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Хлебные крошки">
+        <a href="{% url 'katalog' %}">Главная</a>
+        <span aria-hidden="true">/</span>
+        <span>О сервисе</span>
+    </nav>
+    <section class="service-page" aria-labelledby="service-title">
+        <h1 id="service-title">О сервисе проката</h1>
+        <p>На сайте можно подобрать строительный инструмент для ремонта и работы на объекте.</p>
+        <h2>Как взять инструмент</h2>
+        <ol>
+            <li>Выберите инструмент в каталоге и проверьте его стоимость и залог.</li>
+            <li>Укажите срок аренды и оформите заказ.</li>
+            <li>После оформления заказ появится в личном кабинете.</li>
+        </ol>
+        <a class="button" href="{% url 'katalog' %}">Перейти в каталог</a>
+    </section>
+{% endblock %}

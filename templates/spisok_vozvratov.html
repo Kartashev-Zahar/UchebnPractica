@@ -1,17 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Инструменты на возврат</h1>
-    <section class="zakazy">
+    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{% url 'katalog' %}">Главная</a><span>/</span><span>Возвраты</span></nav>
+    <header class="page-heading"><h1>Возвраты</h1><p>Заказы, которые арендаторы передали на приём</p></header>
+    <a class="button list-action" href="#return-list">Оформить возврат</a>
+    <section class="zakazy" id="return-list">
         {% for item in zakazy %}
             <article>
-                <h2>{{ item.ekzemplyar.model.nazvanie }}</h2>
-                <p>Клиент: {{ item.user.username }}</p>
-                <p>Вернуть до: {{ item.data_vozvrata }}</p>
-                <a href="{% url 'vozvrat' item.id %}">Принять возврат</a>
+                <h2>Заказ №{{ item.id }}</h2>
+                <p>{{ item.ekzemplyar.model.nazvanie }} · {{ item.user.username }}</p>
+                <p>Вернуть до: {{ item.data_vozvrata|date:"d.m.Y H:i" }} · Статус: {{ item.status }}</p>
+                <a class="button button--outline" href="{% url 'vozvrat' item.id %}">Открыть</a>
             </article>
         {% empty %}
-            <p>Активных договоров нет.</p>
+            <p>Нет заказов, ожидающих приёма.</p>
         {% endfor %}
     </section>
 {% endblock %}

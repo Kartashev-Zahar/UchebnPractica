@@ -1,15 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Инструменты на ремонт</h1>
+    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{% url 'katalog' %}">Главная</a><span>/</span><span>Ремонт</span></nav>
+    <header class="page-heading"><h1>Инструменты в ремонте</h1><p>Список неисправных инструментов и комментарии</p></header>
+    <button class="button list-action" type="button" disabled>Отметить готовым</button>
     <section class="zakazy">
         {% for item in instrumenty %}
             <article>
-                <h2>{{ item.model.nazvanie }}</h2>
-                <p>Серийный номер: {{ item.seriinij_nomer }}</p>
+                <h2>{{ item.model.nazvanie }} · ремонт</h2>
+                <p>Серийный номер: {{ item.seriinij_nomer }} · Статус: ремонт</p>
                 <form method="post" action="{% url 'remont_zavershit' item.id %}">
                     {% csrf_token %}
-                    <button class="knopka">Отметить ремонт завершенным</button>
+                    <button class="button button--outline" type="submit">Готово</button>
                 </form>
             </article>
         {% empty %}

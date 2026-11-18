@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Хлебные крошки">
+        <a href="{% url 'katalog' %}">Главная</a><span>/</span><span>Личный кабинет</span>
+    </nav>
+    <header class="page-heading">
+        <h1>Личный кабинет</h1>
+        <p>Данные профиля и управление заказами</p>
+    </header>
+    <section class="profile-card">
+        <h2>{{ user.username }}</h2>
+        {% if user.email %}<p>{{ user.email }}</p>{% endif %}
+        <div class="profile-actions">
+            <a class="button" href="{% url 'moi_zakazy' %}">Мои заказы</a>
+            <a class="button button--outline" href="{% url 'password_change' %}">Сменить пароль</a>
+        </div>
+    </section>
+{% endblock %}

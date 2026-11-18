@@ -1,3 +1,16 @@
+const menuButton = document.querySelector(".menu-toggle");
+const mainNavigation = document.querySelector("#main-navigation");
+
+if (menuButton && mainNavigation) {
+    menuButton.addEventListener("click", () => {
+        const isExpanded = menuButton.getAttribute("aria-expanded") === "true";
+        menuButton.setAttribute("aria-expanded", String(!isExpanded));
+        menuButton.setAttribute("aria-label", isExpanded ? "Открыть меню" : "Закрыть меню");
+        mainNavigation.classList.toggle("is-open", !isExpanded);
+    });
+}
+
+if (document.querySelector("#stats") && document.querySelector("#diagramma")) {
 fetch("/statistika/")
     .then(response => response.json())
     .then(data => {
@@ -31,3 +44,4 @@ fetch("/statistika/")
             diagramma.append(column);
         });
     });
+}

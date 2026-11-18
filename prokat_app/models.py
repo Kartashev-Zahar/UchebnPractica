@@ -85,8 +85,13 @@ class Raskhodnik(models.Model):
 
 class Dogovor(models.Model):
     POLUCHENIE = "Оформлен"
+    OZHIDAET_VOZVRATA = "Ожидает возврата"
     VOZVRAT = "Возвращен"
-    STATUS_CHOICES = [(POLUCHENIE, POLUCHENIE), (VOZVRAT, VOZVRAT)]
+    STATUS_CHOICES = [
+        (POLUCHENIE, POLUCHENIE),
+        (OZHIDAET_VOZVRATA, OZHIDAET_VOZVRATA),
+        (VOZVRAT, VOZVRAT),
+    ]
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="dogovory",

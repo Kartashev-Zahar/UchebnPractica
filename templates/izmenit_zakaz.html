@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <section class="forma">
-        <h1>Изменить срок аренды</h1>
+    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{% url 'katalog' %}">Главная</a><span>/</span><span>Изменение заказа</span></nav>
+    <header class="page-heading"><h1>Изменение заказа</h1><p>Новый срок аренды, итоговая сумма</p></header>
+    <section class="forma forma--tall">
+        <label>Инструмент<input type="text" value="{{ dogovor.ekzemplyar.model.nazvanie }}" readonly></label>
         <form method="post">
             {% csrf_token %}
             <label>
-                Суток
+                Срок аренды, дней
                 <input type="number" name="srok" min="1" max="60" value="{{ dogovor.srok_dnej }}">
             </label>
-            <button class="knopka">Сохранить</button>
+            <p class="form-hint">Дополнительные услуги: {{ dogovor.osnastka.all|join:", " }}</p>
+            <p class="form-total">Итого к оплате: {{ dogovor.summa }} ₽</p>
+            <button class="button" type="submit">Сохранить</button>
         </form>
     </section>
 {% endblock %}

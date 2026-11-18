@@ -1,23 +1,31 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Мои заказы</h1>
-    <p><a class="knopka" href="{% url 'csv_zakazy' %}">Скачать список CSV</a></p>
+    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{% url 'katalog' %}">Главная</a><span>/</span><span>Мои заказы</span></nav>
+    <header class="page-heading"><h1>Мои заказы</h1><p>Список активных и прошлых заказов, статусы</p></header>
+    <p><a class="button" href="{% url 'csv_zakazy' %}">Все заказы</a></p>
     <section class="zakazy">
         {% for item in zakazy %}
             <article>
-                <h2>{{ item.ekzemplyar.model.nazvanie }}</h2>
-                <p>Срок: {{ item.srok_dnej }} суток</p>
-                <p>Стоимость: {{ item.summa }} ₽</p>
+                <h2>Заказ №{{ item.id }}</h2>
+                <p>{{ item.ekzemplyar.model.nazvanie }}</p>
+                <p>Срок: {{ item.srok_dnej }} суток · {{ item.summa }} ₽</p>
                 <p>Залог: {{ item.zalog.summa }} ₽, остаток: {{ item.zalog.ostatok }} ₽</p>
-                <p>Вернуть до: {{ item.data_vozvrata }}</p>
-                <p>Статус: {{ item.status }}</p>
+                <p>Вернуть до: {{ item.data_vozvrata|date:"d.m.Y H:i" }} · Статус: {{ item.status }}</p>
                 {% if item.status == 'Оформлен' %}
-                    <a class="knopka" href="{% url 'zakaz_izmenit' item.id %}">Изменить срок</a>
-                    <form method="post" action="{% url 'zakaz_udalenie' item.id %}">
-                        {% csrf_token %}
-                        <button class="knopka">Отменить аренду</button>
-                    </form>
+                    <div class="order-actions">
+                        <form method="post" action="{% url 'zakaz_udalenie' item.id %}">
+                            {% csrf_token %}
+                            <button class="button button--secondary" type="submit">Отменить аренду</button>
+                        </form>
+                        <a class="button" href="{% url 'zakaz_izmenit' item.id %}">Изменить срок</a>
+                        <form method="post" action="{% url 'zakaz_zavershit' item.id %}">
+                            {% csrf_token %}
+                            <button class="button" type="submit">Завершить аренду</button>
+                        </form>
+                    </div>
+                {% elif item.status == 'Ожидает возврата' %}
+                    <p>Аренда завершена. Передайте инструмент кладовщику для проверки.</p>
                 {% endif %}
             </article>
         {% empty %}

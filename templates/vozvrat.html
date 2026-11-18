@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <section class="forma">
-        <h1>Возврат инструмента</h1>
-        <p>Договор №{{ dogovor.id }}</p>
+    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{% url 'katalog' %}">Главная</a><span>/</span><span>Оформление возврата</span></nav>
+    <header class="page-heading"><h1>Приём инструмента</h1><p>Фактическое время и состояние инструмента</p></header>
+    <section class="forma forma--tall">
+        <p>Договор №{{ dogovor.id }} - {{ dogovor.ekzemplyar.model.nazvanie }}</p>
         <form method="post">
             {% csrf_token %}
             <label>
@@ -11,10 +12,9 @@
                 <input type="datetime-local" name="data_vozvrata" required>
             </label>
             <label>
-                <input type="checkbox" name="ispraven" checked>
-                Инструмент исправен
+                <input type="checkbox" name="ispraven" checked> Состояние инструмента - исправен
             </label>
-            <button class="knopka">Принять возврат</button>
+            <button class="button" type="submit">Принять возврат</button>
         </form>
     </section>
 {% endblock %}

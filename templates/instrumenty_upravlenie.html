@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <section class="forma">
+    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{% url 'katalog' %}">Главная</a><span>/</span><span>Управление инструментами</span></nav>
+    <header class="page-heading"><h1>Управление инструментами</h1><p>Поиск, список инструмента, редактирование</p></header>
+    <a class="button list-action" href="#tool-form">Добавить инструмент</a>
+    <section class="forma" id="tool-form">
         <h1>
             {% if instrument %}
                 Изменить инструмент
@@ -12,11 +15,11 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
-            <button class="knopka">Сохранить</button>
+            <button class="button" type="submit">Сохранить</button>
         </form>
     </section>
 
-    <h2>Инструменты каталога</h2>
+    <h2 class="list-title">Инструменты каталога</h2>
     <section class="zakazy">
         {% for item in instrumenty %}
             <article>

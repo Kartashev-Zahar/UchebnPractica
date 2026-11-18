@@ -60,17 +60,21 @@
                 <div class="product-grid">
                     {% for item in stranica %}
                         <article class="product-card">
-                            <a class="product-card__image-link" href="{% url 'arenda' item.id %}" aria-label="Подробнее: {{ item.nazvanie }}">
+                            {% if item.est_svobodny %}<a class="product-card__image-link" href="{% url 'arenda' item.id %}" aria-label="Подробнее: {{ item.nazvanie }}">{% else %}<div class="product-card__image-link">{% endif %}
                                 {% if item.foto_fajl %}
-                                    <img class="product-card__image" src="{{ item.foto_fajl.url }}" alt="{{ item.nazvanie }}" width="400" height="250" loading="lazy">
+                                    <img class="product-card__image" src="{{ item.foto_fajl.url }}" alt="{{ item.nazvanie }}" width="400" height="250" {% if forloop.counter > 3 %}loading="lazy"{% endif %}>
                                 {% else %}
-                                    <img class="product-card__image" src="{% static 'img/' %}{{ item.foto }}" alt="{{ item.nazvanie }}" width="400" height="250" loading="lazy">
+                                    <img class="product-card__image" src="{% static 'img/' %}{{ item.foto }}" alt="{{ item.nazvanie }}" width="400" height="250" {% if forloop.counter > 3 %}loading="lazy"{% endif %}>
                                 {% endif %}
-                            </a>
+                            {% if item.est_svobodny %}</a>{% else %}</div>{% endif %}
                             <div class="product-card__body">
-                                <h2 class="product-card__title"><a href="{% url 'arenda' item.id %}">{{ item.nazvanie }}</a></h2>
-                                <p class="product-card__meta">Цена за сутки · залог</p>
-                                <a class="button product-card__button" href="{% url 'arenda' item.id %}">Подробнее</a>
+                                <h2 class="product-card__title">{% if item.est_svobodny %}<a href="{% url 'arenda' item.id %}">{{ item.nazvanie }}</a>{% else %}{{ item.nazvanie }}{% endif %}</h2>
+                                <p class="product-card__meta">{{ item.cena_za_sutki|floatformat:0 }} ₽ за сутки · залог {{ item.zalog|floatformat:0 }} ₽</p>
+                                {% if item.est_svobodny %}
+                                    <a class="button product-card__button" href="{% url 'arenda' item.id %}">Подробнее</a>
+                                {% else %}
+                                    <p class="product-card__availability">Нет свободных экземпляров</p>
+                                {% endif %}
                             </div>
                         </article>
                     {% empty %}

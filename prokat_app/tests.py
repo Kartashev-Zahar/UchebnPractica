@@ -27,9 +27,10 @@ class ProkatTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Перфоратор")
         self.assertContains(response, '<option value="1" selected>')
-        self.assertContains(response, '<option value="da" selected>')
+        self.assertContains(response, 'name="dostupen" value="da" checked')
         self.assertContains(response, '<option value="-cena_za_sutki" selected>')
-        self.assertContains(response, 'name="cena_do" type="number" placeholder="Цена до, ₽" value="1200"')
+        self.assertContains(response, 'name="cena_do"')
+        self.assertContains(response, 'value="1200"')
 
     def test_arenda_i_skidka(self):
         self.client.force_login(self.user)
@@ -49,6 +50,11 @@ class ProkatTests(TestCase):
             srok_dnej=1, summa=1000,
         )
         Zalog.objects.create(dogovor=dogovor, summa=5000, ostatok=5000)
+        self.client.force_login(self.user)
+        response = self.client.post(f"/zakazy/{dogovor.id}/zavershit/")
+        self.assertRedirects(response, "/moi-zakazy/")
+        dogovor.refresh_from_db()
+        self.assertEqual(dogovor.status, Dogovor.OZHIDAET_VOZVRATA)
         self.client.force_login(staff)
         fakt_data = timezone.localtime(dogovor.data_vozvrata + timedelta(hours=3)).strftime("%Y-%m-%dT%H:%M")
         response = self.client.post(f"/vozvrat/{dogovor.id}/", {"data_vozvrata": fakt_data, "ispraven": "on"})

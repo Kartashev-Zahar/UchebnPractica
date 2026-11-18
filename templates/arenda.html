@@ -1,26 +1,32 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <section class="forma">
-        <h1>Аренда: {{ instrument.nazvanie }}</h1>
-        <p>Залог: {{ instrument.zalog }} ₽. Скидка рассчитывается по тарифу для выбранного срока.</p>
+    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{% url 'katalog' %}">Главная</a><span>/</span><span>Аренда</span></nav>
+    <header class="page-heading"><h1>Оформление аренды</h1><p>Выбор срока, залога и дополнительных услуг</p></header>
+    <section class="forma forma--tall">
+        <label>Инструмент<input type="text" value="{{ instrument.nazvanie }}" readonly></label>
+        <p class="form-hint">Залог: {{ instrument.zalog }} ₽</p>
         {% if ошибка %}
             <p>{{ ошибка }}</p>
         {% endif %}
+        {% if dostupen %}
         <form method="post">
             {% csrf_token %}
             <label>
                 Срок аренды в сутках
                 <input type="number" name="srok" min="1" max="60" value="1" required>
             </label>
-            <p>Расходники</p>
+            <label>Дополнительные услуги<select name="osnastka" multiple>
             {% for item in osnastka %}
-                <label>
-                    <input type="checkbox" name="osnastka" value="{{ item.id }}">
-                    {{ item.nazvanie }} ({{ item.cena }} ₽)
-                </label>
+                <option value="{{ item.id }}">{{ item.nazvanie }} ({{ item.cena }} ₽)</option>
             {% endfor %}
-            <button class="knopka">Оформить аренду</button>
+            </select></label>
+            <p class="form-total">Итого рассчитывается после выбора срока</p>
+            <button class="button" type="submit">Оформить аренду</button>
         </form>
+        {% else %}
+            <p class="form-hint">Сейчас нет свободных исправных экземпляров этого инструмента.</p>
+            <a class="button" href="{% url 'katalog' %}">Вернуться в каталог</a>
+        {% endif %}
     </section>
 {% endblock %}

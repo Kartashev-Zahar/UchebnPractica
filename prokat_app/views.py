@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Avg, Count, Q, Sum
+from django.db.models import Avg, Count, Exists, OuterRef, Q, Sum
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -34,7 +34,12 @@ def registraciya(request):
 
 
 def katalog(request):
-    spisok = ModelInstrumenta.objects.all()
+    dostupnye_ekzemplyary = Ekzemplyar.objects.filter(
+        model_id=OuterRef("pk"), svoboden=True, ispraven=True
+    )
+    spisok = ModelInstrumenta.objects.annotate(
+        est_svobodny=Exists(dostupnye_ekzemplyary)
+    )
     text = request.GET.get("q", "")
     kategoriya = request.GET.get("kategoriya", "")
     dostupen = request.GET.get("dostupen", "")
@@ -46,7 +51,7 @@ def katalog(request):
     if kategoriya:
         spisok = spisok.filter(kategoriya_id=kategoriya)
     if dostupen == "da":
-        spisok = spisok.filter(ekzemplyar__svoboden=True, ekzemplyar__ispraven=True).distinct()
+        spisok = spisok.filter(est_svobodny=True)
     if cena_do.isdigit():
         spisok = spisok.filter(cena_za_sutki__lte=int(cena_do))
     if zalog_do.isdigit():
@@ -64,6 +69,10 @@ def katalog(request):
         "cena_do": cena_do,
         "zalog_do": zalog_do,
     })
+
+
+def o_servise(request):
+    return render(request, "o_servise.html")
 
 
 def statistika(request):
@@ -136,11 +145,19 @@ def arenda(request, instrument_id):
     if request.method == "POST":
         dnej = int(request.POST.get("srok", 1))
         if dnej < 1 or dnej > 60:
-            return render(request, "arenda.html", {"instrument": instrument, "oshibka": "Укажите срок от 1 до 60 суток."})
+            return render(request, "arenda.html", {
+                "instrument": instrument,
+                "oshibka": "Укажите срок от 1 до 60 суток.",
+                "dostupen": True,
+            })
         with transaction.atomic():
             ekzemplyar = Ekzemplyar.objects.select_for_update().filter(model=instrument, ispraven=True, svoboden=True).first()
             if not ekzemplyar:
-                return render(request, "arenda.html", {"instrument": instrument, "oshibka": "Сейчас нет свободных инструментов."})
+                return render(request, "arenda.html", {
+                    "instrument": instrument,
+                    "oshibka": "Свободных экземпляров больше нет. Выберите другой инструмент.",
+                    "dostupen": False,
+                })
             nachalo = date.today()
             dogovor = Dogovor.objects.create(
                 user=request.user, ekzemplyar=ekzemplyar, data_nachala=nachalo,
@@ -158,13 +175,25 @@ def arenda(request, instrument_id):
         send_mail("Аренда оформлена", f"Заказ для {instrument.nazvanie} принят.", None, [request.user.email] if request.user.email else [], fail_silently=True)
         return redirect("moi_zakazy")
     from .models import Raskhodnik
-    return render(request, "arenda.html", {"instrument": instrument, "osnastka": Raskhodnik.objects.all()})
+    dostupen = Ekzemplyar.objects.filter(
+        model=instrument, ispraven=True, svoboden=True
+    ).exists()
+    return render(request, "arenda.html", {
+        "instrument": instrument,
+        "osnastka": Raskhodnik.objects.all(),
+        "dostupen": dostupen,
+    })
 
 
 @login_required
 def moi_zakazy(request):
     zakazy = Dogovor.objects.filter(user=request.user).select_related("ekzemplyar__model")
     return render(request, "zakazy.html", {"zakazy": zakazy})
+
+
+@login_required
+def profil(request):
+    return render(request, "profil.html")
 
 
 @login_required
@@ -193,10 +222,24 @@ def zakaz_udalenie(request, dogovor_id):
 
 
 @login_required
+def zakaz_zavershit(request, dogovor_id):
+    if request.method == "POST":
+        dogovor = get_object_or_404(
+            Dogovor,
+            id=dogovor_id,
+            user=request.user,
+            status=Dogovor.POLUCHENIE,
+        )
+        dogovor.status = Dogovor.OZHIDAET_VOZVRATA
+        dogovor.save(update_fields=["status"])
+    return redirect("moi_zakazy")
+
+
+@login_required
 def spisok_vozvratov(request):
     if not est_rol(request.user, "Кладовщик"):
         return HttpResponseForbidden("Нет доступа")
-    zakazy = Dogovor.objects.filter(status=Dogovor.POLUCHENIE).select_related("ekzemplyar__model")
+    zakazy = Dogovor.objects.filter(status=Dogovor.OZHIDAET_VOZVRATA).select_related("ekzemplyar__model")
     return render(request, "spisok_vozvratov.html", {"zakazy": zakazy})
 
 
@@ -204,7 +247,7 @@ def spisok_vozvratov(request):
 def vozvrat(request, dogovor_id):
     if not est_rol(request.user, "Кладовщик"):
         return HttpResponseForbidden("Нет доступа")
-    dogovor = get_object_or_404(Dogovor, id=dogovor_id, status=Dogovor.POLUCHENIE)
+    dogovor = get_object_or_404(Dogovor, id=dogovor_id, status=Dogovor.OZHIDAET_VOZVRATA)
     if request.method == "POST":
         fakt_data = datetime.fromisoformat(request.POST["data_vozvrata"])
         fakt_data = timezone.make_aware(fakt_data)

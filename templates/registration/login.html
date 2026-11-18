@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <section class="forma">
-        <h1>Вход</h1>
+    <nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{% url 'katalog' %}">Главная</a><span>/</span><span>Вход</span></nav>
+    <header class="page-heading"><h1>Вход в аккаунт</h1><p>Логин и пароль, ссылка на регистрацию</p></header>
+    <section class="forma forma--tall">
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button class="knopka">Войти</button>
+            <button class="button" type="submit">Войти</button>
         </form>
-        <p><a href="{% url 'registraciya' %}">Создать аккаунт</a></p>
+        <p class="form-note">Нет аккаунта? <a href="{% url 'registraciya' %}">Зарегистрироваться</a></p>
     </section>
 {% endblock %}
