@@ -3,6 +3,21 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 
+class KontaktnyeDannye(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name="kontakty", verbose_name="пользователь",
+    )
+    telefon = models.CharField("Телефон", max_length=16, unique=True)
+
+    class Meta:
+        verbose_name = "контактные данные"
+        verbose_name_plural = "контактные данные"
+
+    def __str__(self):
+        return self.telefon
+
+
 def proverit_foto(file):
     if file.size > 2 * 1024 * 1024:
         raise ValidationError("Размер фотографии не должен превышать 2 МБ.")

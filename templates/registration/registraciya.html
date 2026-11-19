@@ -2,7 +2,7 @@
 
 {% block content %}
     <nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{% url 'katalog' %}">Главная</a><span>/</span><span>Регистрация</span></nav>
-    <header class="page-heading"><h1>Создание аккаунта</h1><p>Логин и пароль, повтор пароля</p></header>
+    <header class="page-heading"><h1>Создание аккаунта</h1><p>Придумайте логин и укажите почту или телефон</p></header>
     <section class="forma forma--tall">
         <form method="post">
             {% csrf_token %}

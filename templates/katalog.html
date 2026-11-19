@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block title %}Каталог инструмента{% endblock %}
+{% block meta_description %}Каталог строительных инструментов в аренду. Выберите инструмент, проверьте наличие, цену за сутки и залог.{% endblock %}
 
 {% block content %}
     <nav class="breadcrumbs" aria-label="Хлебные крошки">
@@ -56,15 +57,15 @@
             </form>
 
             <div class="catalog-results">
-                <p class="catalog-results__count">Найдено: {{ stranica.paginator.count }}</p>
+                <p class="catalog-results__count" data-live-count data-total="{{ stranica.paginator.count }}" aria-live="polite">Найдено: {{ stranica.paginator.count }}</p>
                 <div class="product-grid">
                     {% for item in stranica %}
-                        <article class="product-card">
+                        <article class="product-card" data-product-card>
                             {% if item.est_svobodny %}<a class="product-card__image-link" href="{% url 'arenda' item.id %}" aria-label="Подробнее: {{ item.nazvanie }}">{% else %}<div class="product-card__image-link">{% endif %}
                                 {% if item.foto_fajl %}
                                     <img class="product-card__image" src="{{ item.foto_fajl.url }}" alt="{{ item.nazvanie }}" width="400" height="250" {% if forloop.counter > 3 %}loading="lazy"{% endif %}>
                                 {% else %}
-                                    <img class="product-card__image" src="{% static 'img/' %}{{ item.foto }}" alt="{{ item.nazvanie }}" width="400" height="250" {% if forloop.counter > 3 %}loading="lazy"{% endif %}>
+                                    <img class="product-card__image" src="{% static 'img/' %}{{ item.foto|cut:'.png' }}.webp" alt="{{ item.nazvanie }}" width="400" height="250" {% if forloop.counter == 1 %}fetchpriority="high"{% elif forloop.counter > 3 %}loading="lazy"{% endif %}>
                                 {% endif %}
                             {% if item.est_svobodny %}</a>{% else %}</div>{% endif %}
                             <div class="product-card__body">
@@ -99,5 +100,11 @@
                 {% endif %}
             </nav>
         {% endif %}
+    </section>
+
+    <section class="rental-stats" aria-labelledby="rental-stats-title">
+        <h2 id="rental-stats-title">Свободные инструменты</h2>
+        <p id="stats" class="rental-stats__summary" role="status" aria-live="polite">Загружаем статистику...</p>
+        <div id="diagramma" class="rental-stats__chart" role="region" aria-label="Количество свободных инструментов по категориям"></div>
     </section>
 {% endblock %}

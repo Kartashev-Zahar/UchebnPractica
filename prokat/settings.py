@@ -42,6 +42,7 @@ WSGI_APPLICATION = "prokat.wsgi.application"
 
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
 AUTH_PASSWORD_VALIDATORS = []
+AUTHENTICATION_BACKENDS = ["prokat_app.backends.EmailPhoneBackend"]
 LANGUAGE_CODE = "ru-ru"
 TIME_ZONE = "Europe/Moscow"
 USE_I18N = True

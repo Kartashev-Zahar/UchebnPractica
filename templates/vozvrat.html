@@ -7,13 +7,12 @@
         <p>Договор №{{ dogovor.id }} - {{ dogovor.ekzemplyar.model.nazvanie }}</p>
         <form method="post">
             {% csrf_token %}
-            <label>
-                Дата и время возврата
-                <input type="datetime-local" name="data_vozvrata" required>
-            </label>
-            <label>
-                <input type="checkbox" name="ispraven" checked> Состояние инструмента - исправен
-            </label>
+            {{ form.non_field_errors }}
+            <label for="{{ form.data_vozvrata.id_for_label }}">{{ form.data_vozvrata.label }}</label>
+            {{ form.data_vozvrata }}
+            {{ form.data_vozvrata.errors }}
+            <label class="checkbox-label" for="{{ form.ispraven.id_for_label }}">{{ form.ispraven }} {{ form.ispraven.label }}</label>
+            {{ form.ispraven.errors }}
             <button class="button" type="submit">Принять возврат</button>
         </form>
     </section>

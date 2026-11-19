@@ -1,17 +1,38 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 import csv
 from math import ceil
+from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
+from django.urls import reverse_lazy
 from django.db import transaction
 from django.db.models import Avg, Count, Exists, OuterRef, Q, Sum
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from .forms import FormaInstrumenta, FormaRegistracii
-from .models import Dogovor, Ekzemplyar, Kategoriya, ModelInstrumenta, AktProverki, Tarif, Uderzhanie, Zalog
+from .forms import FormaArendy, FormaInstrumenta, FormaIzmeneniyaZakaza, FormaRegistracii, FormaVhoda, FormaVozvrata
+from .models import Dogovor, Ekzemplyar, Kategoriya, ModelInstrumenta, AktProverki, Raskhodnik, Tarif, Uderzhanie, Zalog
+
+
+class VhodView(LoginView):
+    template_name = "registration/login.html"
+    form_class = FormaVhoda
+
+    def form_valid(self, form):
+        messages.success(self.request, "Вы вошли в аккаунт.")
+        return super().form_valid(form)
+
+
+class SmenaParolyaView(PasswordChangeView):
+    template_name = "registration/password_change_form.html"
+    success_url = reverse_lazy("password_change_done")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Пароль успешно изменён.")
+        return super().form_valid(form)
 
 
 def cena_arendy(stavka, dney):
@@ -29,6 +50,7 @@ def registraciya(request):
     if request.method == "POST" and form.is_valid():
         user = form.save()
         login(request, user)
+        messages.success(request, "Аккаунт создан. Вы вошли на сайт.")
         return redirect("katalog")
     return render(request, "registration/registraciya.html", {"form": form})
 
@@ -102,6 +124,7 @@ def instrumenty_upravlenie(request):
     form = FormaInstrumenta(request.POST or None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
         form.save()
+        messages.success(request, "Инструмент добавлен.")
         return redirect("instrumenty_upravlenie")
     return render(request, "instrumenty_upravlenie.html", {"form": form, "instrumenty": ModelInstrumenta.objects.all()})
 
@@ -114,6 +137,7 @@ def instrument_redaktirovat(request, instrument_id):
     form = FormaInstrumenta(request.POST or None, request.FILES or None, instance=instrument)
     if request.method == "POST" and form.is_valid():
         form.save()
+        messages.success(request, "Изменения инструмента сохранены.")
         return redirect("instrumenty_upravlenie")
     return render(request, "instrumenty_upravlenie.html", {"form": form, "instrument": instrument})
 
@@ -124,6 +148,7 @@ def instrument_udalenie(request, instrument_id):
         return HttpResponseForbidden("Нет доступа")
     if request.method == "POST":
         get_object_or_404(ModelInstrumenta, id=instrument_id).delete()
+        messages.success(request, "Инструмент удалён.")
     return redirect("instrumenty_upravlenie")
 
 
@@ -142,46 +167,39 @@ def csv_zakazy(request):
 @login_required
 def arenda(request, instrument_id):
     instrument = get_object_or_404(ModelInstrumenta, id=instrument_id)
-    if request.method == "POST":
-        dnej = int(request.POST.get("srok", 1))
-        if dnej < 1 or dnej > 60:
-            return render(request, "arenda.html", {
-                "instrument": instrument,
-                "oshibka": "Укажите срок от 1 до 60 суток.",
-                "dostupen": True,
-            })
+    form = FormaArendy(request.POST or None)
+    dostupen = Ekzemplyar.objects.filter(model=instrument, ispraven=True, svoboden=True).exists()
+    if request.method == "POST" and form.is_valid():
+        dney = form.cleaned_data["srok"]
+        osnastka = form.cleaned_data["osnastka"]
         with transaction.atomic():
-            ekzemplyar = Ekzemplyar.objects.select_for_update().filter(model=instrument, ispraven=True, svoboden=True).first()
+            ekzemplyar = Ekzemplyar.objects.select_for_update().filter(
+                model=instrument, ispraven=True, svoboden=True
+            ).first()
             if not ekzemplyar:
-                return render(request, "arenda.html", {
-                    "instrument": instrument,
-                    "oshibka": "Свободных экземпляров больше нет. Выберите другой инструмент.",
-                    "dostupen": False,
-                })
-            nachalo = date.today()
-            dogovor = Dogovor.objects.create(
-                user=request.user, ekzemplyar=ekzemplyar, data_nachala=nachalo,
-                data_vozvrata=timezone.now() + timedelta(days=dnej), srok_dnej=dnej,
-                summa=cena_arendy(instrument.cena_za_sutki, dnej),
-            )
-            Zalog.objects.create(dogovor=dogovor, summa=instrument.zalog, ostatok=instrument.zalog)
-            osnastka = request.POST.getlist("osnastka")
-            dogovor.osnastka.set(osnastka)
-            if osnastka:
-                dogovor.summa += sum(item.cena for item in dogovor.osnastka.all())
-                dogovor.save()
-            ekzemplyar.svoboden = False
-            ekzemplyar.save()
-        send_mail("Аренда оформлена", f"Заказ для {instrument.nazvanie} принят.", None, [request.user.email] if request.user.email else [], fail_silently=True)
-        return redirect("moi_zakazy")
-    from .models import Raskhodnik
-    dostupen = Ekzemplyar.objects.filter(
-        model=instrument, ispraven=True, svoboden=True
-    ).exists()
+                form.add_error(None, "Свободных экземпляров больше нет. Выберите другой инструмент.")
+                dostupen = False
+            else:
+                dogovor = Dogovor.objects.create(
+                    user=request.user, ekzemplyar=ekzemplyar, data_nachala=date.today(),
+                    data_vozvrata=timezone.now() + timedelta(days=dney), srok_dnej=dney,
+                    summa=cena_arendy(instrument.cena_za_sutki, dney),
+                )
+                Zalog.objects.create(dogovor=dogovor, summa=instrument.zalog, ostatok=instrument.zalog)
+                dogovor.osnastka.set(osnastka)
+                if osnastka:
+                    dogovor.summa += sum(item.cena for item in osnastka)
+                    dogovor.save()
+                ekzemplyar.svoboden = False
+                ekzemplyar.save()
+        if ekzemplyar:
+            send_mail("Аренда оформлена", f"Заказ для {instrument.nazvanie} принят.", None, [request.user.email] if request.user.email else [], fail_silently=True)
+            messages.success(request, "Аренда оформлена. Заказ появился в разделе «Мои заказы».")
+            return redirect("moi_zakazy")
     return render(request, "arenda.html", {
-        "instrument": instrument,
-        "osnastka": Raskhodnik.objects.all(),
-        "dostupen": dostupen,
+        "instrument": instrument, "form": form, "dostupen": dostupen,
+        "tarify": list(Tarif.objects.order_by("ot_dney").values("ot_dney", "skidka")),
+        "raskhodniki": list(Raskhodnik.objects.values("id", "cena")),
     })
 
 
@@ -199,16 +217,17 @@ def profil(request):
 @login_required
 def zakaz_izmenit(request, dogovor_id):
     dogovor = get_object_or_404(Dogovor, id=dogovor_id, user=request.user, status=Dogovor.POLUCHENIE)
-    if request.method == "POST":
-        dnej = int(request.POST.get("srok", dogovor.srok_dnej))
-        if 1 <= dnej <= 60:
-            dogovor.srok_dnej = dnej
-            dogovor.data_vozvrata = timezone.now() + timedelta(days=dnej)
-            rashodniki = sum(item.cena for item in dogovor.osnastka.all())
-            dogovor.summa = cena_arendy(dogovor.ekzemplyar.model.cena_za_sutki, dnej) + rashodniki
-            dogovor.save()
-            return redirect("moi_zakazy")
-    return render(request, "izmenit_zakaz.html", {"dogovor": dogovor})
+    form = FormaIzmeneniyaZakaza(request.POST or None, initial={"srok": dogovor.srok_dnej})
+    if request.method == "POST" and form.is_valid():
+        dney = form.cleaned_data["srok"]
+        dogovor.srok_dnej = dney
+        dogovor.data_vozvrata = timezone.now() + timedelta(days=dney)
+        rashodniki = sum(item.cena for item in dogovor.osnastka.all())
+        dogovor.summa = cena_arendy(dogovor.ekzemplyar.model.cena_za_sutki, dney) + rashodniki
+        dogovor.save()
+        messages.success(request, "Срок аренды изменён.")
+        return redirect("moi_zakazy")
+    return render(request, "izmenit_zakaz.html", {"dogovor": dogovor, "form": form})
 
 
 @login_required
@@ -218,6 +237,7 @@ def zakaz_udalenie(request, dogovor_id):
         dogovor.ekzemplyar.svoboden = True
         dogovor.ekzemplyar.save()
         dogovor.delete()
+        messages.success(request, "Аренда отменена.")
     return redirect("moi_zakazy")
 
 
@@ -232,6 +252,7 @@ def zakaz_zavershit(request, dogovor_id):
         )
         dogovor.status = Dogovor.OZHIDAET_VOZVRATA
         dogovor.save(update_fields=["status"])
+        messages.success(request, "Аренда завершена. Передайте инструмент кладовщику для приёма.")
     return redirect("moi_zakazy")
 
 
@@ -248,9 +269,12 @@ def vozvrat(request, dogovor_id):
     if not est_rol(request.user, "Кладовщик"):
         return HttpResponseForbidden("Нет доступа")
     dogovor = get_object_or_404(Dogovor, id=dogovor_id, status=Dogovor.OZHIDAET_VOZVRATA)
-    if request.method == "POST":
-        fakt_data = datetime.fromisoformat(request.POST["data_vozvrata"])
-        fakt_data = timezone.make_aware(fakt_data)
+    form = FormaVozvrata(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        fakt_data = form.cleaned_data["data_vozvrata"]
+        if timezone.is_naive(fakt_data):
+            fakt_data = timezone.make_aware(fakt_data)
+        ispraven = form.cleaned_data["ispraven"]
         prosrochka = max((fakt_data - dogovor.data_vozvrata).total_seconds() / 3600, 0)
         stavka = dogovor.ekzemplyar.model.cena_za_sutki
         summa = round(stavka / 24 * prosrochka) if prosrochka <= 4 else stavka * ceil(prosrochka / 24)
@@ -258,17 +282,18 @@ def vozvrat(request, dogovor_id):
             dogovor.data_fakt_vozvrata = fakt_data
             dogovor.status = Dogovor.VOZVRAT
             dogovor.save()
-            AktProverki.objects.create(dogovor=dogovor, ispraven=request.POST.get("ispraven") == "on")
+            AktProverki.objects.create(dogovor=dogovor, ispraven=ispraven)
             zalog = dogovor.zalog
             uderzhanie = min(summa, zalog.ostatok)
             zalog.ostatok -= uderzhanie
             zalog.save()
             Uderzhanie.objects.create(dogovor=dogovor, summa=uderzhanie, prichina="Просрочка")
             dogovor.ekzemplyar.svoboden = True
-            dogovor.ekzemplyar.ispraven = request.POST.get("ispraven") == "on"
+            dogovor.ekzemplyar.ispraven = ispraven
             dogovor.ekzemplyar.save()
+        messages.success(request, "Возврат принят.")
         return redirect("moi_zakazy")
-    return render(request, "vozvrat.html", {"dogovor": dogovor})
+    return render(request, "vozvrat.html", {"dogovor": dogovor, "form": form})
 
 
 @login_required
@@ -287,4 +312,5 @@ def remont_zavershit(request, ekzemplyar_id):
         instrument = get_object_or_404(Ekzemplyar, id=ekzemplyar_id, ispraven=False)
         instrument.ispraven = True
         instrument.save()
+        messages.success(request, "Инструмент отмечен как исправный.")
     return redirect("remont")

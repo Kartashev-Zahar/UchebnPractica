@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
 from django.contrib.auth.models import Group
-from .models import AktProverki, Dogovor, Ekzemplyar, Kategoriya, ModelInstrumenta, Tarif, Uderzhanie, Zalog
+from .models import AktProverki, Dogovor, Ekzemplyar, Kategoriya, KontaktnyeDannye, ModelInstrumenta, Tarif, Uderzhanie, Zalog
 
 
 class ProkatTests(TestCase):
@@ -67,13 +67,40 @@ class ProkatTests(TestCase):
 
     def test_registraciya_i_pokazateli(self):
         response = self.client.post("/registraciya/", {
-            "username": "noviy", "email": "noviy@example.com",
+            "username": "noviy", "contact": "noviy@example.com",
             "password1": "practice-pass-9182", "password2": "practice-pass-9182",
+        })
+        self.assertRedirects(response, "/")
+        self.client.logout()
+        response = self.client.post("/accounts/login/", {
+            "username": "noviy@example.com", "password": "practice-pass-9182",
         })
         self.assertRedirects(response, "/")
         response = self.client.get("/statistika/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["pozicij"], 1)
+
+    def test_registraciya_i_vhod_po_telefonu(self):
+        response = self.client.post("/registraciya/", {
+            "username": "telefon_user", "contact": "8 (999) 123-45-67",
+            "password1": "practice-pass-9182", "password2": "practice-pass-9182",
+        })
+        self.assertRedirects(response, "/")
+        user = User.objects.exclude(username="klient").get()
+        self.assertEqual(user.kontakty.telefon, "+79991234567")
+        self.client.logout()
+        response = self.client.post("/accounts/login/", {
+            "username": "+7 999 123-45-67", "password": "practice-pass-9182",
+        })
+        self.assertRedirects(response, "/")
+
+    def test_nevalidnyj_kontakt_otobrazhaet_oshibku(self):
+        response = self.client.post("/registraciya/", {
+            "username": "bad_contact", "contact": "не почта и не телефон",
+            "password1": "practice-pass-9182", "password2": "practice-pass-9182",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Введите корректную почту или телефон")
 
     def test_master_mozhet_zakryt_remont(self):
         master = User.objects.create_user("master", password="test-pass-123")

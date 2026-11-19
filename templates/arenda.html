@@ -6,22 +6,20 @@
     <section class="forma forma--tall">
         <label>Инструмент<input type="text" value="{{ instrument.nazvanie }}" readonly></label>
         <p class="form-hint">Залог: {{ instrument.zalog }} ₽</p>
-        {% if ошибка %}
-            <p>{{ ошибка }}</p>
-        {% endif %}
-        {% if dostupen %}
-        <form method="post">
+        {% if dostupen or form.errors %}
+        <form method="post" data-rental-calculator data-daily-price="{{ instrument.cena_za_sutki }}">
             {% csrf_token %}
-            <label>
-                Срок аренды в сутках
-                <input type="number" name="srok" min="1" max="60" value="1" required>
-            </label>
-            <label>Дополнительные услуги<select name="osnastka" multiple>
-            {% for item in osnastka %}
-                <option value="{{ item.id }}">{{ item.nazvanie }} ({{ item.cena }} ₽)</option>
-            {% endfor %}
-            </select></label>
-            <p class="form-total">Итого рассчитывается после выбора срока</p>
+            {{ tarify|json_script:"rental-tariffs" }}
+            {{ raskhodniki|json_script:"rental-extras" }}
+            {{ form.non_field_errors }}
+            <label for="{{ form.srok.id_for_label }}">{{ form.srok.label }}</label>
+            {{ form.srok }}
+            {{ form.srok.errors }}
+            <label for="{{ form.osnastka.id_for_label }}">{{ form.osnastka.label }}</label>
+            {{ form.osnastka }}
+            {{ form.osnastka.errors }}
+            <p class="form-total" data-rental-total aria-live="polite">Итого к оплате: {{ instrument.cena_za_sutki }} ₽</p>
+            <p class="form-hint">Залог оплачивается отдельно.</p>
             <button class="button" type="submit">Оформить аренду</button>
         </form>
         {% else %}
