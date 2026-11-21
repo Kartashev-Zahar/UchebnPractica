@@ -70,7 +70,7 @@ def katalog(request):
     sort = request.GET.get("sort", "nazvanie")
     if text:
         spisok = spisok.filter(Q(nazvanie__icontains=text) | Q(opisanie__icontains=text))
-    if kategoriya:
+    if kategoriya.isdigit():
         spisok = spisok.filter(kategoriya_id=kategoriya)
     if dostupen == "da":
         spisok = spisok.filter(est_svobodny=True)
@@ -139,7 +139,11 @@ def instrument_redaktirovat(request, instrument_id):
         form.save()
         messages.success(request, "Изменения инструмента сохранены.")
         return redirect("instrumenty_upravlenie")
-    return render(request, "instrumenty_upravlenie.html", {"form": form, "instrument": instrument})
+    return render(request, "instrumenty_upravlenie.html", {
+        "form": form,
+        "instrument": instrument,
+        "instrumenty": ModelInstrumenta.objects.all(),
+    })
 
 
 @login_required
@@ -205,7 +209,7 @@ def arenda(request, instrument_id):
 
 @login_required
 def moi_zakazy(request):
-    zakazy = Dogovor.objects.filter(user=request.user).select_related("ekzemplyar__model")
+    zakazy = Dogovor.objects.filter(user=request.user).select_related("ekzemplyar__model", "zalog")
     return render(request, "zakazy.html", {"zakazy": zakazy})
 
 
@@ -260,7 +264,9 @@ def zakaz_zavershit(request, dogovor_id):
 def spisok_vozvratov(request):
     if not est_rol(request.user, "Кладовщик"):
         return HttpResponseForbidden("Нет доступа")
-    zakazy = Dogovor.objects.filter(status=Dogovor.OZHIDAET_VOZVRATA).select_related("ekzemplyar__model")
+    zakazy = Dogovor.objects.filter(status=Dogovor.OZHIDAET_VOZVRATA).select_related(
+        "ekzemplyar__model", "user"
+    )
     return render(request, "spisok_vozvratov.html", {"zakazy": zakazy})
 
 
@@ -271,6 +277,10 @@ def vozvrat(request, dogovor_id):
     dogovor = get_object_or_404(Dogovor, id=dogovor_id, status=Dogovor.OZHIDAET_VOZVRATA)
     form = FormaVozvrata(request.POST or None)
     if request.method == "POST" and form.is_valid():
+        zalog = Zalog.objects.filter(dogovor=dogovor).first()
+        if zalog is None:
+            form.add_error(None, "Для договора не найден залог. Возврат не проведён, обратитесь к администратору.")
+            return render(request, "vozvrat.html", {"dogovor": dogovor, "form": form})
         fakt_data = form.cleaned_data["data_vozvrata"]
         if timezone.is_naive(fakt_data):
             fakt_data = timezone.make_aware(fakt_data)
@@ -283,7 +293,6 @@ def vozvrat(request, dogovor_id):
             dogovor.status = Dogovor.VOZVRAT
             dogovor.save()
             AktProverki.objects.create(dogovor=dogovor, ispraven=ispraven)
-            zalog = dogovor.zalog
             uderzhanie = min(summa, zalog.ostatok)
             zalog.ostatok -= uderzhanie
             zalog.save()
