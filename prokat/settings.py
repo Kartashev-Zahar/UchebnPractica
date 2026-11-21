@@ -7,6 +7,9 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or secret_file.read_text().stri
 DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
 
+# The debugging toolbar is enabled only for local development.
+INTERNAL_IPS = ["127.0.0.1", "localhost"]
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -17,6 +20,9 @@ INSTALLED_APPS = [
     "prokat_app",
 ]
 
+if DEBUG:
+    INSTALLED_APPS += ["debug_toolbar"]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -25,6 +31,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
+
+if DEBUG:
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.middleware.common.CommonMiddleware") + 1,
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    )
 
 ROOT_URLCONF = "prokat.urls"
 TEMPLATES = [{
@@ -55,3 +67,38 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "app": {
+            "format": "{asctime} {levelname} {name} {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "app_file": {
+            "class": "logging.FileHandler",
+            "filename": LOG_DIR / "app.log",
+            "encoding": "utf-8",
+            "level": "DEBUG",
+            "formatter": "app",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["app_file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "prokat_app": {
+            "handlers": ["app_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+}

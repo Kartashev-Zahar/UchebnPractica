@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 import csv
+import logging
 from math import ceil
 from django.contrib import messages
 from django.contrib.auth import login
@@ -16,14 +17,21 @@ from django.utils import timezone
 from .forms import FormaArendy, FormaInstrumenta, FormaIzmeneniyaZakaza, FormaRegistracii, FormaVhoda, FormaVozvrata
 from .models import Dogovor, Ekzemplyar, Kategoriya, ModelInstrumenta, AktProverki, Raskhodnik, Tarif, Uderzhanie, Zalog
 
+logger = logging.getLogger(__name__)
+
 
 class VhodView(LoginView):
     template_name = "registration/login.html"
     form_class = FormaVhoda
 
     def form_valid(self, form):
+        logger.info("Пользователь успешно вошёл в систему")
         messages.success(self.request, "Вы вошли в аккаунт.")
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        logger.warning("Неудачная попытка входа: форма авторизации не прошла проверку")
+        return super().form_invalid(form)
 
 
 class SmenaParolyaView(PasswordChangeView):
@@ -47,11 +55,20 @@ def est_rol(user, rol):
 
 def registraciya(request):
     form = FormaRegistracii(request.POST or None)
+    if request.method == "POST":
+        logger.info("Начата обработка формы регистрации")
     if request.method == "POST" and form.is_valid():
-        user = form.save()
+        try:
+            user = form.save()
+        except Exception:
+            logger.exception("Не удалось сохранить нового пользователя")
+            raise
+        logger.info("Регистрация успешно завершена")
         login(request, user)
         messages.success(request, "Аккаунт создан. Вы вошли на сайт.")
         return redirect("katalog")
+    if request.method == "POST":
+        logger.warning("Форма регистрации отклонена: найдены ошибки валидации")
     return render(request, "registration/registraciya.html", {"form": form})
 
 
@@ -98,6 +115,7 @@ def o_servise(request):
 
 
 def statistika(request):
+    logger.debug("Запрошены данные статистики каталога")
     return JsonResponse({
         "pozicij": ModelInstrumenta.objects.count(),
         "ekzemplyarov": Ekzemplyar.objects.count(),
@@ -123,7 +141,12 @@ def instrumenty_upravlenie(request):
         return HttpResponseForbidden("Нет доступа")
     form = FormaInstrumenta(request.POST or None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        try:
+            form.save()
+        except Exception:
+            logger.exception("Не удалось сохранить новую модель инструмента")
+            raise
+        logger.info("Новая модель инструмента сохранена")
         messages.success(request, "Инструмент добавлен.")
         return redirect("instrumenty_upravlenie")
     return render(request, "instrumenty_upravlenie.html", {"form": form, "instrumenty": ModelInstrumenta.objects.all()})
@@ -136,7 +159,12 @@ def instrument_redaktirovat(request, instrument_id):
     instrument = get_object_or_404(ModelInstrumenta, id=instrument_id)
     form = FormaInstrumenta(request.POST or None, request.FILES or None, instance=instrument)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        try:
+            form.save()
+        except Exception:
+            logger.exception("Не удалось сохранить изменения модели инструмента")
+            raise
+        logger.info("Изменения модели инструмента сохранены")
         messages.success(request, "Изменения инструмента сохранены.")
         return redirect("instrumenty_upravlenie")
     return render(request, "instrumenty_upravlenie.html", {
@@ -174,6 +202,7 @@ def arenda(request, instrument_id):
     form = FormaArendy(request.POST or None)
     dostupen = Ekzemplyar.objects.filter(model=instrument, ispraven=True, svoboden=True).exists()
     if request.method == "POST" and form.is_valid():
+        logger.info("Начата обработка формы аренды")
         dney = form.cleaned_data["srok"]
         osnastka = form.cleaned_data["osnastka"]
         with transaction.atomic():
@@ -181,6 +210,7 @@ def arenda(request, instrument_id):
                 model=instrument, ispraven=True, svoboden=True
             ).first()
             if not ekzemplyar:
+                logger.warning("Аренда не оформлена: нет свободного исправного экземпляра")
                 form.add_error(None, "Свободных экземпляров больше нет. Выберите другой инструмент.")
                 dostupen = False
             else:
@@ -197,6 +227,7 @@ def arenda(request, instrument_id):
                 ekzemplyar.svoboden = False
                 ekzemplyar.save()
         if ekzemplyar:
+            logger.info("Договор аренды успешно создан")
             send_mail("Аренда оформлена", f"Заказ для {instrument.nazvanie} принят.", None, [request.user.email] if request.user.email else [], fail_silently=True)
             messages.success(request, "Аренда оформлена. Заказ появился в разделе «Мои заказы».")
             return redirect("moi_zakazy")
@@ -279,6 +310,7 @@ def vozvrat(request, dogovor_id):
     if request.method == "POST" and form.is_valid():
         zalog = Zalog.objects.filter(dogovor=dogovor).first()
         if zalog is None:
+            logger.error("Возврат не проведён: для договора отсутствует запись о залоге")
             form.add_error(None, "Для договора не найден залог. Возврат не проведён, обратитесь к администратору.")
             return render(request, "vozvrat.html", {"dogovor": dogovor, "form": form})
         fakt_data = form.cleaned_data["data_vozvrata"]
@@ -300,6 +332,7 @@ def vozvrat(request, dogovor_id):
             dogovor.ekzemplyar.svoboden = True
             dogovor.ekzemplyar.ispraven = ispraven
             dogovor.ekzemplyar.save()
+        logger.info("Возврат успешно обработан")
         messages.success(request, "Возврат принят.")
         return redirect("moi_zakazy")
     return render(request, "vozvrat.html", {"dogovor": dogovor, "form": form})
