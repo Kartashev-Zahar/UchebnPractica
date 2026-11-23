@@ -21,7 +21,13 @@ class KontaktnyeDannye(models.Model):
 def proverit_foto(file):
     if file.size > 2 * 1024 * 1024:
         raise ValidationError("Размер фотографии не должен превышать 2 МБ.")
-    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
+    content_type = getattr(file, "content_type", None)
+    if content_type is None:
+        content_type = getattr(getattr(file, "file", None), "content_type", None)
+    if content_type is None:
+        extension = file.name.rsplit(".", 1)[-1].lower() if "." in file.name else ""
+        content_type = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png", "webp": "image/webp"}.get(extension)
+    if content_type not in ["image/jpeg", "image/png", "image/webp"]:
         raise ValidationError("Можно загрузить JPG, PNG или WEBP.")
 
 
