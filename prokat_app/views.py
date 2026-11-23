@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.urls import reverse_lazy
@@ -23,13 +24,32 @@ logger = logging.getLogger(__name__)
 class VhodView(LoginView):
     template_name = "registration/login.html"
     form_class = FormaVhoda
+    max_failed_attempts = 5
+    lockout_seconds = 300
+
+    def login_attempt_cache_key(self):
+        remote_addr = self.request.META.get("REMOTE_ADDR", "unknown")
+        return f"login-failures:{remote_addr}"
+
+    def dispatch(self, request, *args, **kwargs):
+        cache_key = self.login_attempt_cache_key()
+        if request.method == "POST" and cache.get(cache_key, 0) >= self.max_failed_attempts:
+            form = self.get_form()
+            form.add_error(None, "Слишком много неудачных попыток входа. Попробуйте через 5 минут.")
+            return self.render_to_response(self.get_context_data(form=form), status=429)
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        cache.delete(self.login_attempt_cache_key())
         logger.info("Пользователь успешно вошёл в систему")
         messages.success(self.request, "Вы вошли в аккаунт.")
         return super().form_valid(form)
 
     def form_invalid(self, form):
+        if self.request.method == "POST":
+            cache_key = self.login_attempt_cache_key()
+            attempts = cache.get(cache_key, 0) + 1
+            cache.set(cache_key, attempts, self.lockout_seconds)
         logger.warning("Неудачная попытка входа: форма авторизации не прошла проверку")
         return super().form_invalid(form)
 

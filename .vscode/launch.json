@@ -9,8 +9,9 @@
       "args": ["runserver", "127.0.0.1:8000", "--noreload"],
       "django": true,
       "justMyCode": true,
+      "envFile": "${workspaceFolder}/.env",
       "env": {
-        "DJANGO_DEBUG": "True"
+        "DJANGO_DEBUG": "False"
       }
     }
   ]

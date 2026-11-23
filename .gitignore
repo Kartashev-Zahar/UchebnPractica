@@ -5,4 +5,5 @@ media/
 .venv/
 venv/
 .secret_key
+.env
 logs/*.log

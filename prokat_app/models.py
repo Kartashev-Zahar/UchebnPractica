@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from pathlib import PurePosixPath
 
 
 class KontaktnyeDannye(models.Model):
@@ -21,14 +22,25 @@ class KontaktnyeDannye(models.Model):
 def proverit_foto(file):
     if file.size > 2 * 1024 * 1024:
         raise ValidationError("Размер фотографии не должен превышать 2 МБ.")
-    content_type = getattr(file, "content_type", None)
-    if content_type is None:
-        content_type = getattr(getattr(file, "file", None), "content_type", None)
-    if content_type is None:
-        extension = file.name.rsplit(".", 1)[-1].lower() if "." in file.name else ""
-        content_type = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png", "webp": "image/webp"}.get(extension)
-    if content_type not in ["image/jpeg", "image/png", "image/webp"]:
+    extension = PurePosixPath(file.name.lower()).suffix
+    allowed_extensions = {".jpg", ".jpeg", ".png", ".webp"}
+    if extension not in allowed_extensions:
         raise ValidationError("Можно загрузить JPG, PNG или WEBP.")
+
+    original_position = file.tell()
+    try:
+        file.seek(0)
+        header = file.read(32)
+        file.seek(max(file.size - 2, 0))
+        ending = file.read(2)
+    finally:
+        file.seek(original_position)
+
+    is_jpeg = extension in {".jpg", ".jpeg"} and header.startswith(b"\xff\xd8\xff") and ending == b"\xff\xd9"
+    is_png = extension == ".png" and header.startswith(b"\x89PNG\r\n\x1a\n") and header[12:16] == b"IHDR"
+    is_webp = extension == ".webp" and header.startswith(b"RIFF") and header[8:12] == b"WEBP"
+    if not (is_jpeg or is_png or is_webp):
+        raise ValidationError("Содержимое файла не соответствует изображению JPG, PNG или WEBP.")
 
 
 class Kategoriya(models.Model):

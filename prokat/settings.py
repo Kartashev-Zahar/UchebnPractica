@@ -4,7 +4,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 secret_file = BASE_DIR / ".secret_key"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or secret_file.read_text().strip()
-DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in {"1", "true"}
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
 
 # The debugging toolbar is enabled only for local development.
@@ -30,6 +30,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 if DEBUG:
@@ -53,7 +54,14 @@ TEMPLATES = [{
 WSGI_APPLICATION = "prokat.wsgi.application"
 
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
-AUTH_PASSWORD_VALIDATORS = []
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+X_FRAME_OPTIONS = "DENY"
+SECURE_CONTENT_TYPE_NOSNIFF = True
 AUTHENTICATION_BACKENDS = ["prokat_app.backends.EmailPhoneBackend"]
 LANGUAGE_CODE = "ru-ru"
 TIME_ZONE = "Europe/Moscow"
