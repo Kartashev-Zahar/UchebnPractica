@@ -86,7 +86,12 @@ def katalog(request):
     zalog_do = request.GET.get("zalog_do", "")
     sort = request.GET.get("sort", "nazvanie")
     if text:
-        spisok = spisok.filter(Q(nazvanie__icontains=text) | Q(opisanie__icontains=text))
+        query = text.casefold()
+        matching_ids = [
+            pk for pk, nazvanie, opisanie in spisok.values_list("pk", "nazvanie", "opisanie")
+            if query in f"{nazvanie} {opisanie}".casefold()
+        ]
+        spisok = spisok.filter(pk__in=matching_ids)
     if kategoriya.isdigit():
         spisok = spisok.filter(kategoriya_id=kategoriya)
     if dostupen == "da":
