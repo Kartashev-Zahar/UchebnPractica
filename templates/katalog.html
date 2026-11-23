@@ -70,6 +70,7 @@
                             {% if item.est_svobodny %}</a>{% else %}</div>{% endif %}
                             <div class="product-card__body">
                                 <h2 class="product-card__title">{% if item.est_svobodny %}<a href="{% url 'arenda' item.id %}">{{ item.nazvanie }}</a>{% else %}{{ item.nazvanie }}{% endif %}</h2>
+                                {% if item.opisanie %}<p class="product-card__description">{{ item.opisanie|truncatechars:120 }}</p>{% endif %}
                                 <p class="product-card__meta">{{ item.cena_za_sutki|floatformat:0 }} ₽ за сутки · залог {{ item.zalog|floatformat:0 }} ₽</p>
                                 {% if item.est_svobodny %}
                                     <a class="button product-card__button" href="{% url 'arenda' item.id %}">Подробнее</a>
