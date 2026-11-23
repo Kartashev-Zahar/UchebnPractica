@@ -52,6 +52,8 @@
                     <option value="nazvanie" {% if selected_sort == "nazvanie" %}selected{% endif %}>По названию</option>
                     <option value="cena_za_sutki" {% if selected_sort == "cena_za_sutki" %}selected{% endif %}>Сначала дешевле</option>
                     <option value="-cena_za_sutki" {% if selected_sort == "-cena_za_sutki" %}selected{% endif %}>Сначала дороже</option>
+                    <option value="zalog" {% if selected_sort == "zalog" %}selected{% endif %}>Сначала меньший залог</option>
+                    <option value="-zalog" {% if selected_sort == "-zalog" %}selected{% endif %}>Сначала больший залог</option>
                 </select>
                 <button class="button catalog-sidebar__submit" type="submit">Применить</button>
             </form>
