@@ -46,7 +46,7 @@ class ProkatTests(TestCase):
         dogovor = Dogovor.objects.create(
             user=self.user, ekzemplyar=self.ekzemplyar,
             data_nachala=timezone.localdate(),
-            data_vozvrata=timezone.now().replace(second=0, microsecond=0),
+            data_vozvrata=timezone.now().replace(second=0, microsecond=0) - timedelta(hours=3),
             srok_dnej=1, summa=1000,
         )
         Zalog.objects.create(dogovor=dogovor, summa=5000, ostatok=5000)
@@ -56,7 +56,7 @@ class ProkatTests(TestCase):
         dogovor.refresh_from_db()
         self.assertEqual(dogovor.status, Dogovor.OZHIDAET_VOZVRATA)
         self.client.force_login(staff)
-        fakt_data = timezone.localtime(dogovor.data_vozvrata + timedelta(hours=3)).strftime("%Y-%m-%dT%H:%M")
+        fakt_data = timezone.localtime(timezone.now()).strftime("%Y-%m-%dT%H:%M")
         response = self.client.post(f"/vozvrat/{dogovor.id}/", {"data_vozvrata": fakt_data, "ispraven": "on"})
         self.assertRedirects(response, "/moi-zakazy/")
         self.assertEqual(Uderzhanie.objects.get(dogovor=dogovor).summa, 125)

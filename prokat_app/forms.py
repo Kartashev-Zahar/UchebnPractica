@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
+from django.utils import timezone
 from .models import KontaktnyeDannye, ModelInstrumenta, Raskhodnik
 from .phone_utils import normalize_phone
 
@@ -92,3 +93,11 @@ class FormaVozvrata(forms.Form):
         widget=forms.DateTimeInput(format="%Y-%m-%dT%H:%M", attrs={"type": "datetime-local"}),
     )
     ispraven = forms.BooleanField(label="Состояние инструмента - исправен", required=False, initial=True)
+
+    def clean_data_vozvrata(self):
+        value = self.cleaned_data["data_vozvrata"]
+        if timezone.is_naive(value):
+            value = timezone.make_aware(value)
+        if value > timezone.now():
+            raise forms.ValidationError("Дата и время возврата не могут быть в будущем.")
+        return value
