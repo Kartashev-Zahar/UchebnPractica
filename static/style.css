@@ -75,6 +75,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .catalog-intro h1 { margin: 0; font-size: clamp(24px, 2.3vw, 32px); line-height: 1.25; }
 .catalog-intro__text { margin: 6px 0 0; color: var(--color-muted); font-size: 14px; }
 
+.error-page {
+    width: min(100%, 620px);
+    margin: 48px auto;
+    padding: 36px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    text-align: center;
+}
+.error-page__code { margin: 0; color: var(--color-muted); font-size: 14px; font-weight: 700; letter-spacing: .12em; }
+.error-page h1 { margin: 8px 0; font-size: clamp(24px, 2.3vw, 32px); line-height: 1.25; }
+.error-page > p:not(.error-page__code) { margin: 0; color: var(--color-muted); }
+.error-page__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 24px; }
+
 .button {
     display: inline-flex;
     min-height: 40px;

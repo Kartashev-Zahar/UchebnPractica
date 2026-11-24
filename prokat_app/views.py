@@ -12,13 +12,28 @@ from django.core.paginator import Paginator
 from django.urls import reverse_lazy
 from django.db import transaction
 from django.db.models import Avg, Count, Exists, OuterRef, Q, Sum
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from .forms import FormaArendy, FormaInstrumenta, FormaIzmeneniyaZakaza, FormaRegistracii, FormaVhoda, FormaVozvrata
 from .models import Dogovor, Ekzemplyar, Kategoriya, ModelInstrumenta, AktProverki, Raskhodnik, Tarif, Uderzhanie, Zalog
 
 logger = logging.getLogger(__name__)
+
+
+def error_403(request, exception=None):
+    logger.warning("Запрос отклонён: недостаточно прав (403)")
+    return render(request, "403.html", status=403)
+
+
+def error_404(request, exception=None):
+    logger.warning("Запрошенная страница или запись не найдена (404)")
+    return render(request, "404.html", status=404)
+
+
+def error_500(request):
+    logger.error("Необработанная ошибка приложения (500)")
+    return render(request, "500.html", status=500)
 
 
 class VhodView(LoginView):
@@ -163,7 +178,7 @@ def statistika(request):
 @login_required
 def instrumenty_upravlenie(request):
     if not request.user.is_superuser:
-        return HttpResponseForbidden("Нет доступа")
+        return error_403(request)
     form = FormaInstrumenta(request.POST or None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
         try:
@@ -180,7 +195,7 @@ def instrumenty_upravlenie(request):
 @login_required
 def instrument_redaktirovat(request, instrument_id):
     if not request.user.is_superuser:
-        return HttpResponseForbidden("Нет доступа")
+        return error_403(request)
     instrument = get_object_or_404(ModelInstrumenta, id=instrument_id)
     form = FormaInstrumenta(request.POST or None, request.FILES or None, instance=instrument)
     if request.method == "POST" and form.is_valid():
@@ -202,7 +217,7 @@ def instrument_redaktirovat(request, instrument_id):
 @login_required
 def instrument_udalenie(request, instrument_id):
     if not request.user.is_superuser:
-        return HttpResponseForbidden("Нет доступа")
+        return error_403(request)
     if request.method == "POST":
         get_object_or_404(ModelInstrumenta, id=instrument_id).delete()
         messages.success(request, "Инструмент удалён.")
@@ -256,6 +271,8 @@ def arenda(request, instrument_id):
             send_mail("Аренда оформлена", f"Заказ для {instrument.nazvanie} принят.", None, [request.user.email] if request.user.email else [], fail_silently=True)
             messages.success(request, "Аренда оформлена. Заказ появился в разделе «Мои заказы».")
             return redirect("moi_zakazy")
+    if request.method == "POST":
+        logger.warning("Форма аренды отклонена: найдены ошибки валидации")
     return render(request, "arenda.html", {
         "instrument": instrument, "form": form, "dostupen": dostupen,
         "tarify": list(Tarif.objects.order_by("ot_dney").values("ot_dney", "skidka")),
@@ -319,7 +336,7 @@ def zakaz_zavershit(request, dogovor_id):
 @login_required
 def spisok_vozvratov(request):
     if not est_rol(request.user, "Кладовщик"):
-        return HttpResponseForbidden("Нет доступа")
+        return error_403(request)
     zakazy = Dogovor.objects.filter(status=Dogovor.OZHIDAET_VOZVRATA).select_related(
         "ekzemplyar__model", "user"
     )
@@ -329,7 +346,7 @@ def spisok_vozvratov(request):
 @login_required
 def vozvrat(request, dogovor_id):
     if not est_rol(request.user, "Кладовщик"):
-        return HttpResponseForbidden("Нет доступа")
+        return error_403(request)
     dogovor = get_object_or_404(Dogovor, id=dogovor_id, status=Dogovor.OZHIDAET_VOZVRATA)
     form = FormaVozvrata(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -366,7 +383,7 @@ def vozvrat(request, dogovor_id):
 @login_required
 def remont(request):
     if not est_rol(request.user, "Мастер"):
-        return HttpResponseForbidden("Нет доступа")
+        return error_403(request)
     instrumenty = Ekzemplyar.objects.filter(ispraven=False).select_related("model")
     return render(request, "remont.html", {"instrumenty": instrumenty})
 
@@ -374,7 +391,7 @@ def remont(request):
 @login_required
 def remont_zavershit(request, ekzemplyar_id):
     if not est_rol(request.user, "Мастер"):
-        return HttpResponseForbidden("Нет доступа")
+        return error_403(request)
     if request.method == "POST":
         instrument = get_object_or_404(Ekzemplyar, id=ekzemplyar_id, ispraven=False)
         instrument.ispraven = True

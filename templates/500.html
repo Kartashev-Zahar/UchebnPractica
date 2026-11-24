@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Ошибка сервера - Прокат инструмента{% endblock %}
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Хлебные крошки">
+        <a href="{% url 'katalog' %}">Главная</a>
+        <span aria-hidden="true">/</span>
+        <span>Ошибка 500</span>
+    </nav>
+    <section class="error-page" aria-labelledby="error-title">
+        <p class="error-page__code">500</p>
+        <h1 id="error-title">Не удалось выполнить запрос</h1>
+        <p>На сайте произошла ошибка. Попробуйте ещё раз немного позже.</p>
+        <div class="error-page__actions">
+            <a class="button" href="{% url 'katalog' %}">На главную</a>
+            <a class="button button--secondary" href="{% url 'katalog' %}#search-tool">Перейти к поиску</a>
+        </div>
+    </section>
+{% endblock %}

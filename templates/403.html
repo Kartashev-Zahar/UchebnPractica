@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Доступ запрещён - Прокат инструмента{% endblock %}
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Хлебные крошки">
+        <a href="{% url 'katalog' %}">Главная</a>
+        <span aria-hidden="true">/</span>
+        <span>Ошибка 403</span>
+    </nav>
+    <section class="error-page" aria-labelledby="error-title">
+        <p class="error-page__code">403</p>
+        <h1 id="error-title">Доступ запрещён</h1>
+        <p>У вашей учётной записи нет прав для этой страницы или действия.</p>
+        <div class="error-page__actions">
+            <a class="button" href="{% url 'katalog' %}">На главную</a>
+            <a class="button button--secondary" href="{% url 'katalog' %}#search-tool">Перейти к поиску</a>
+        </div>
+    </section>
+{% endblock %}

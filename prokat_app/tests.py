@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
 from django.contrib.auth.models import Group
+from unittest.mock import patch
 from .models import AktProverki, Dogovor, Ekzemplyar, Kategoriya, KontaktnyeDannye, ModelInstrumenta, Tarif, Uderzhanie, Zalog
 
 
@@ -142,3 +143,42 @@ class ProkatTests(TestCase):
         self.assertEqual(dogovor.summa, 2700)
         self.client.post(f"/zakazy/{dogovor.id}/udalit/")
         self.assertFalse(Dogovor.objects.filter(pk=dogovor.id).exists())
+
+    def test_neznachushchaya_model_instrumenta_vozvrashchaet_404(self):
+        self.client.force_login(self.user)
+        response = self.client.get("/arenda/999999/")
+        self.assertEqual(response.status_code, 404)
+
+    def test_polzovatel_bez_roli_ne_mozhet_otkryt_vozvraty(self):
+        self.client.force_login(self.user)
+        response = self.client.get("/vozvraty/")
+        self.assertEqual(response.status_code, 403)
+
+    def test_nevernyj_srok_arendy_ne_sozdaet_dogovor(self):
+        self.client.force_login(self.user)
+        response = self.client.post(f"/arenda/{self.model.id}/", {"srok": 61})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Укажите срок аренды от 1 до 60 суток.")
+        self.assertFalse(Dogovor.objects.filter(user=self.user).exists())
+        self.ekzemplyar.refresh_from_db()
+        self.assertTrue(self.ekzemplyar.svoboden)
+
+    def test_oshibka_pri_sozdanii_zaloga_otkatyvaet_arendu(self):
+        self.client.force_login(self.user)
+        with patch("prokat_app.views.Zalog.objects.create", side_effect=RuntimeError("test failure")):
+            with self.assertRaises(RuntimeError):
+                self.client.post(f"/arenda/{self.model.id}/", {"srok": 1})
+        self.assertFalse(Dogovor.objects.filter(user=self.user).exists())
+        self.assertFalse(Zalog.objects.exists())
+        self.ekzemplyar.refresh_from_db()
+        self.assertTrue(self.ekzemplyar.svoboden)
+
+    def test_statistika_na_pustom_kataloge_ne_vyzyvaet_oshibku(self):
+        Ekzemplyar.objects.all().delete()
+        ModelInstrumenta.objects.all().delete()
+        response = self.client.get("/statistika/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["pozicij"], 0)
+        self.assertEqual(response.json()["ekzemplyarov"], 0)
+        self.assertEqual(response.json()["srednyaya_cena"], 0)
+        self.assertEqual(response.json()["summa_zalogov"], 0)

@@ -13,6 +13,10 @@ urlpatterns = [
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+handler403 = "prokat_app.views.error_403"
+handler404 = "prokat_app.views.error_404"
+handler500 = "prokat_app.views.error_500"
+
 if settings.DEBUG:
     import debug_toolbar
 
